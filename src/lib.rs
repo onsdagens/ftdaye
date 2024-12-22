@@ -46,7 +46,7 @@ pub struct JtagAdapter {
 }
 
 #[derive(thiserror::Error, Debug, docsplay::Display)]
-enum JtagProbeError {
+pub enum JtagProbeError {
     /// USB Communication Error
     Usb(#[source] std::io::Error),
     /// An error which is specific to the debug probe in use occurred.
@@ -604,50 +604,50 @@ pub struct FtdiDevice {
 //     }
 // }
 
-// /// Known FTDI device variants.
-// pub static FTDI_COMPAT_DEVICES: &[FtdiDevice] = &[
-//     //
-//     // --- FTDI VID/PID pairs ---
-//     //
-//     // FTDI Ltd. FT2232C/D/H Dual UART/FIFO IC
-//     FtdiDevice {
-//         id: (0x0403, 0x6010),
-//         fallback_chip_type: ChipType::FT2232C,
-//     },
-//     // FTDI Ltd. FT4232H Quad HS USB-UART/FIFO IC
-//     FtdiDevice {
-//         id: (0x0403, 0x6011),
-//         fallback_chip_type: ChipType::FT4232H,
-//     },
-//     // FTDI Ltd. FT232H Single HS USB-UART/FIFO IC
-//     FtdiDevice {
-//         id: (0x0403, 0x6014),
-//         fallback_chip_type: ChipType::FT232H,
-//     },
-//     //
-//     // --- Third-party VID/PID pairs ---
-//     //
-//     // Olimex Ltd. ARM-USB-OCD
-//     FtdiDevice {
-//         id: (0x15ba, 0x0003),
-//         fallback_chip_type: ChipType::FT2232C,
-//     },
-//     // Olimex Ltd. ARM-USB-TINY
-//     FtdiDevice {
-//         id: (0x15ba, 0x0004),
-//         fallback_chip_type: ChipType::FT2232C,
-//     },
-//     // Olimex Ltd. ARM-USB-TINY-H
-//     FtdiDevice {
-//         id: (0x15ba, 0x002a),
-//         fallback_chip_type: ChipType::FT2232H,
-//     },
-//     // Olimex Ltd. ARM-USB-OCD-H
-//     FtdiDevice {
-//         id: (0x15ba, 0x002b),
-//         fallback_chip_type: ChipType::FT2232H,
-//     },
-// ];
+/// Known FTDI device variants.
+pub static FTDI_COMPAT_DEVICES: &[FtdiDevice] = &[
+    //
+    // --- FTDI VID/PID pairs ---
+    //
+    // FTDI Ltd. FT2232C/D/H Dual UART/FIFO IC
+    FtdiDevice {
+        id: (0x0403, 0x6010),
+        fallback_chip_type: ChipType::FT2232C,
+    },
+    // FTDI Ltd. FT4232H Quad HS USB-UART/FIFO IC
+    FtdiDevice {
+        id: (0x0403, 0x6011),
+        fallback_chip_type: ChipType::FT4232H,
+    },
+    // FTDI Ltd. FT232H Single HS USB-UART/FIFO IC
+    FtdiDevice {
+        id: (0x0403, 0x6014),
+        fallback_chip_type: ChipType::FT232H,
+    },
+    //
+    // --- Third-party VID/PID pairs ---
+    //
+    // Olimex Ltd. ARM-USB-OCD
+    FtdiDevice {
+        id: (0x15ba, 0x0003),
+        fallback_chip_type: ChipType::FT2232C,
+    },
+    // Olimex Ltd. ARM-USB-TINY
+    FtdiDevice {
+        id: (0x15ba, 0x0004),
+        fallback_chip_type: ChipType::FT2232C,
+    },
+    // Olimex Ltd. ARM-USB-TINY-H
+    FtdiDevice {
+        id: (0x15ba, 0x002a),
+        fallback_chip_type: ChipType::FT2232H,
+    },
+    // Olimex Ltd. ARM-USB-OCD-H
+    FtdiDevice {
+        id: (0x15ba, 0x002b),
+        fallback_chip_type: ChipType::FT2232H,
+    },
+];
 
 // fn get_device_info(device: &DeviceInfo) -> Option<DebugProbeInfo> {
 //     FTDI_COMPAT_DEVICES.iter().find_map(|ftdi| {
