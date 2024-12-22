@@ -1,5 +1,14 @@
 {
     "cSpell.ignoreWords": [
-        "jtag"
+        "Olimex",
+        "UART",
+        "bitvec",
+        "docsplay",
+        "ftdaye",
+        "ftdi",
+        "jtag",
+        "mpsse",
+        "nusb",
+        "thiserror"
     ]
 }
