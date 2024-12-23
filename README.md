@@ -11,3 +11,13 @@ The openocd script reads the IDCODE, (0362d093 for the ARTY Artix7 T-35).
 ```shell
 openocd -f openocd_read.cfg
 ```
+
+## examples
+
+The IDCODE can be read using the `ftdaye` API.
+
+```shell
+RUST_LOG=ftdaye=debug,idcode=debug cargo run --example idcode
+```
+
+Beware, lot's of debug info, select debug level to `warn` if too verbose.
