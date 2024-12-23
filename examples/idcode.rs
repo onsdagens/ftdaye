@@ -29,10 +29,6 @@ fn main() -> Result<()> {
     jtag_adapter.append_command(tlr_command)?;
     debug!("TLR {:x?}", jtag_adapter);
 
-    // flush command
-    jtag_adapter.flush()?;
-    debug!("TLR flush {:x?}", jtag_adapter);
-
     // put in dr shift state from tlr
     let to_shift_dr_command = Command::TmsBits {
         bit_count: 4,
@@ -43,30 +39,27 @@ fn main() -> Result<()> {
     jtag_adapter.append_command(to_shift_dr_command)?;
     debug!("To Shift DR {:x?}", jtag_adapter);
 
+    // shift dr, assume < 8 bits to read
+    let shift_dr_command = Command::TmsBits {
+        bit_count: 4,
+        tms_bits: 0b0000, // DR shift
+        tdi: false,
+        capture: true,
+    };
+
+    for _ in 0..8 {
+        jtag_adapter.append_command(shift_dr_command.clone())?;
+        debug!("Shift DR {:x?}", jtag_adapter);
+    }
+
     // flush command
     jtag_adapter.flush()?;
-    debug!("To Shift DR flush {:x?}", jtag_adapter);
-
-    debug!("-------");
-    for _ in 0..8 {
-        // shift dr, assume < 8 bits to read
-        let shift_dr_command = Command::TmsBits {
-            bit_count: 4,
-            tms_bits: 0b0000, // DR shift
-            tdi: false,
-            capture: true,
-        };
-        jtag_adapter.append_command(shift_dr_command)?;
-        debug!("Shift DR {:x?}", jtag_adapter);
-
-        // flush command
-        jtag_adapter.flush()?;
-        debug!("Shift DR flush {:x?}", jtag_adapter);
-    }
+    debug!("Shift DR flush {:x?}", jtag_adapter);
 
     let id_code_bits = jtag_adapter.read_captured_bits()?;
     debug!("cp {:?}", id_code_bits);
 
+    // convert BitVec via BitField to integral (u32)
     let idcode: u32 = id_code_bits.load();
 
     debug!("idcode {:#10x}", idcode);
