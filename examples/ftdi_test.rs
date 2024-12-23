@@ -1,4 +1,5 @@
 use anyhow::Result;
+use bitvec::field::BitField;
 use log::*;
 
 use ftdaye::{
@@ -121,5 +122,12 @@ fn main() -> Result<()> {
         debug!("Shift DR flush {:x?}", jtag_adapter);
     }
 
+    let id_code_bits = jtag_adapter.read_captured_bits()?;
+    debug!("cp {:?}", id_code_bits);
+
+    let idcode: u32 = id_code_bits.load();
+
+    debug!("idcode {:#10x}", idcode);
+    assert_eq!(idcode, 0x0362_d093);
     Ok(())
 }
