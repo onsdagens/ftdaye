@@ -62,7 +62,7 @@ fn main() -> Result<()> {
     // convert BitVec via BitField to integral (u32)
     let idcode: u32 = id_code_bits.load();
 
-    debug!("idcode {:#10x}", idcode);
+    debug!("idcode {:#010x}", idcode);
     assert_eq!(idcode, 0x0362_d093);
     Ok(())
 }
