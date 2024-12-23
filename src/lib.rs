@@ -98,6 +98,13 @@ impl JtagAdapter {
         let _ = self.device.read_to_end(&mut junk);
 
         let (output, direction) = self.pin_layout();
+        debug!(
+            "vendor id {:x?}\nproduct id {:x?}, string {:?}",
+            self.device.vendor_id(),
+            self.device.product_id(),
+            self.device.product_string()
+        );
+        debug!("pinmode {:x} {:x}", output, direction);
         self.device.set_pins(output, direction)?;
 
         self.apply_clock_speed(self.speed_khz)?;
@@ -118,7 +125,9 @@ impl JtagAdapter {
             // Digilent HS2
             (0x0403, 0x6014, "Digilent Adept USB Device") => (0x00e8, 0x60eb),
             // Digilent HS1
-            (0x0403, 0x6010, "Digilent Adept USB Device") => (0x0088, 0x008b),
+            (0x0403, 0x6010, "Digilent Adept USB Device")
+            // Digilent Onboard ARTY etc.
+            | (0x0403, 0x6010, "Digilent USB Device") => (0x0088, 0x008b),
             // Other devices:
             // TMS starts high
             // TMS, TDO and TCK are outputs
