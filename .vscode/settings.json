@@ -1,14 +1,16 @@
 {
-    "cSpell.ignoreWords": [
-        "Olimex",
-        "UART",
-        "bitvec",
-        "docsplay",
-        "ftdaye",
-        "ftdi",
-        "jtag",
-        "mpsse",
-        "nusb",
-        "thiserror"
-    ]
+  "cSpell.ignoreWords": [
+    "Olimex",
+    "UART",
+    "bitvec",
+    "docsplay",
+    "ftdaye",
+    "ftdi",
+    "idcode",
+    "jtag",
+    "mpsse",
+    "nusb",
+    "openocd",
+    "thiserror"
+  ]
 }
