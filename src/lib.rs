@@ -31,11 +31,11 @@ use log::*;
 pub mod usb_util;
 
 use command_compacter::Command;
-use ftdaye::{error::FtdiError, ChipType};
+pub use ftdaye::{error::FtdiError, ChipType};
 
 #[derive(Debug)]
 pub struct JtagAdapter {
-    device: ftdaye::Device,
+    pub device: ftdaye::Device,
     speed_khz: u32,
 
     command: Command,
