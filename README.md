@@ -28,3 +28,7 @@ Alternatively after reset we can walk the JTAG STM, setup the IR (0x09, 0_1001 5
 The IDCODE value will be loaded to DR once the IR is set, and directly available to the shift register.
 
 Beware, lot's of debug info, select debug level to `warn` if too verbose.
+
+```shell
+RUST_LOG=ftdaye=debug,ftdi_test=debug cargo run --example ftdi_test
+```
