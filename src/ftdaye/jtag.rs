@@ -1,14 +1,21 @@
 // jtag helpers for ftdi mpsse
 
 use crate::ftdaye::mpsse::{cmd_write_imm, CmdImm};
-use crate::ftdaye::Device;
+use crate::ftdaye::{BitMode, Device};
+
 use log::*;
 use std::io::{Read, Write};
 
+#[derive(Debug)]
+#[allow(dead_code)]
 pub struct FtdiMpsse {
     device: Device,
+    buffer_size_bytes: u16,
+    actual_speed_khz: u16,
 }
 
+// Todo: stateful FtdiMpsse?
+#[allow(dead_code)]
 enum JtagState {
     Rti,
     ShiftDr(u8),
@@ -17,8 +24,63 @@ enum JtagState {
 // Todo: what kind of errors do we want here?
 // for now, just unwrap and panic...
 impl FtdiMpsse {
-    pub fn new(device: Device) -> Self {
-        Self { device }
+    pub fn new(mut device: Device, speed_khz: u32) -> Self {
+        device.usb_reset().unwrap();
+        // 0x0B configures pins for JTAG
+        device.set_bitmode(0x0b, BitMode::Mpsse).unwrap();
+        device.set_latency_timer(1).unwrap();
+        device.usb_purge_buffers().unwrap();
+
+        let mut junk = vec![];
+        let _ = device.read_to_end(&mut junk);
+
+        let (output, direction) = (0x0088, 0x008b);
+        debug!(
+            "vendor id {:x?}\nproduct id {:x?}, string {:?}",
+            device.vendor_id(),
+            device.product_id(),
+            device.product_string()
+        );
+        debug!("pinmode {:x} {:x}", output, direction);
+        device.set_pins(output, direction).unwrap();
+
+        // FTDI 2232
+        // Disable divide-by-5 mode
+        device.disable_divide_by_5().unwrap();
+        let buffer_size_bytes: u16 = 4096;
+        let max_clock_khz: u32 = 30_000;
+
+        // If `speed_khz` is not a divisor of the maximum supported speed, we need to round up
+        let is_exact = max_clock_khz % speed_khz == 0;
+
+        // If `speed_khz` is 0, use the maximum supported speed
+        let divisor =
+            (max_clock_khz.checked_div(speed_khz).unwrap_or(1) - is_exact as u32).min(0xFFFF);
+
+        let actual_speed_khz = (max_clock_khz / (divisor + 1)) as u16;
+
+        info!(
+            "Setting speed to {} kHz (divisor: {}, actual speed: {} kHz)",
+            speed_khz, divisor, actual_speed_khz
+        );
+
+        device.configure_clock_divider(divisor as u16).unwrap();
+
+        device.disable_loopback().unwrap();
+
+        // check bad command
+        let bad_command = [0xAB];
+        device.write_all(&bad_command).unwrap();
+
+        let mut junk = vec![];
+        let r = device.read_to_end(&mut junk);
+
+        debug!("r {:?}, buf {:x?}", r, junk);
+        Self {
+            device,
+            buffer_size_bytes,
+            actual_speed_khz,
+        }
     }
 
     pub fn read_write_register(&mut self, ir: u8, data: &mut [u8]) {
