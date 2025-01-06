@@ -1,4 +1,5 @@
 pub mod error;
+pub mod mpsse;
 
 use std::collections::VecDeque;
 use std::io::{self, Read, Write};
