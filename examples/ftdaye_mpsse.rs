@@ -1,3 +1,4 @@
+use ftdaye::ftdaye::jtag::FtdiMpsse;
 use ftdaye::ftdaye::mpsse::cmd_write_imm;
 use ftdaye::ftdaye::{BitMode, Device, Interface};
 use log::*;
@@ -77,82 +78,29 @@ fn main() {
 
     debug!("r {:?}, buf {:x?}", r, junk);
 
+    let mut ft = FtdiMpsse::new(device);
+
     println!("-- reset --");
-    reset_to_rti(&mut device);
+    ft.reset_to_rti();
 
-    println!("read idcode through register");
-    rti_to_shift_ir(&mut device);
-    shift_ir(&mut device, 0b00_1001);
+    let mut data = [0u8; 4];
+    ft.read_write_register(0b00_1001, &mut data);
 
-    rti_to_shift_dr(&mut device);
-    device.write(&cmd_write_imm(&[0, 0, 0, 0])).unwrap();
-    let mut b4 = [0u8; 4];
-    device.read_exact(&mut b4).unwrap();
-    println!("read {:#04x?}", b4);
-    let idcode = u32::from_le_bytes(b4);
-    println!("read {:#010x?}", idcode);
+    println!("read data   {:#04x?}", data);
+    let idcode = u32::from_le_bytes(data);
+    println!("read idcode {:#010x?}", idcode);
     assert_eq!(idcode, 0x0362d093);
-    dr_to_rti(&mut device);
 
     println!("write user3 through setting ir");
-    rti_to_shift_ir(&mut device);
-    shift_ir(&mut device, 0b10_0010);
+    let mut data = [0x1, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08];
+    ft.read_write_register(0b10_0010, &mut data);
+    println!("first read {:x?}", data);
 
-    rti_to_shift_dr(&mut device);
-    device
-        .write(&cmd_write_imm(&[
-            0x1, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-        ]))
-        .unwrap();
-    let mut b8 = [0u8; 8];
-    device.read_exact(&mut b8);
-    println!("first read {:x?}", b8);
-    dr_to_rti(&mut device);
+    let mut data = [0xde, 0xad, 0xbe, 0xef, 1, 3, 3, 7];
+    ft.read_write_register(0b10_0010, &mut data);
+    println!("second read {:x?}", data);
 
-    rti_to_shift_dr(&mut device);
-    device
-        .write(&cmd_write_imm(&[0xde, 0xad, 0xbe, 0xef, 1, 3, 3, 7]))
-        .unwrap();
-    let mut b8 = [0u8; 8];
-    device.read_exact(&mut b8);
-    println!("second read {:x?}", b8);
-    dr_to_rti(&mut device);
-
-    rti_to_shift_dr(&mut device);
-    device
-        .write(&cmd_write_imm(&[0, 0, 0, 0, 0, 0, 0, 0]))
-        .unwrap();
-    let mut b8 = [0u8; 8];
-    device.read_exact(&mut b8);
-    println!("3rd read {:x?}", b8);
-    dr_to_rti(&mut device);
-}
-
-// reset state machine, and go to rti
-fn reset_to_rti(device: &mut Device) {
-    device.write(&[0x4b, 5, 0b11111, 0x87]).unwrap();
-    device.write(&[0x4b, 0, 0b0, 0x87]).unwrap();
-}
-
-fn rti_to_shift_dr(device: &mut Device) {
-    device.write(&[0x4b, 2, 0b001, 0x87]).unwrap();
-}
-
-fn rti_to_shift_ir(device: &mut Device) {
-    device.write(&[0x4b, 3, 0b0011, 0x87]).unwrap();
-}
-
-fn dr_to_rti(device: &mut Device) {
-    device.write(&[0x4b, 2, 0b011, 0x87]).unwrap();
-}
-
-fn ir_to_rti(device: &mut Device, bit7: u8) {
-    device.write(&[0x4b, 2, bit7 | 0b011, 0x87]).unwrap();
-}
-
-fn shift_ir(device: &mut Device, ir: u8) {
-    // 5 bits of ir
-    device.write(&[0x1b, 4, ir, 0x87]).unwrap();
-    // msb of ir as bit 7 of next transaction
-    ir_to_rti(device, (ir & 0b10_0000) << 2);
+    let mut data = [0, 0, 0, 0, 0, 0, 0, 0];
+    ft.read_write_register(0b10_0010, &mut data);
+    println!("third read {:x?}", data);
 }

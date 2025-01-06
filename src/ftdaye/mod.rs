@@ -1,4 +1,5 @@
 pub mod error;
+pub mod jtag;
 pub mod mpsse;
 
 use std::collections::VecDeque;
