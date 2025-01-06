@@ -1,3 +1,5 @@
+#![allow(non_upper_case_globals)]
+
 pub const fn cmd_shift(
     neg_ve_clk_read: bool,
     bit_mode: bool,
@@ -18,7 +20,6 @@ pub const fn cmd_shift(
 
 // 3.4.9 Clock Data Bytes In and Out LSB first
 #[rustfmt::skip]
-#[allow(non_upper_case_globals)]
 pub const Clock_Data_Bytes_In_and_Out_LSB_first: u8 = cmd_shift(
     true, 
     false, 
@@ -28,8 +29,8 @@ pub const Clock_Data_Bytes_In_and_Out_LSB_first: u8 = cmd_shift(
     true, 
     false);
 
-#[allow(non_upper_case_globals)]
 pub const CmdImm: u8 = 0x87;
+pub const CmdBadCommand: u8 = 0xAB;
 
 pub fn cmd_write_imm(data: &[u8]) -> Vec<u8> {
     assert!(

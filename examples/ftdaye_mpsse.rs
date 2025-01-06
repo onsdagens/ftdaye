@@ -85,7 +85,7 @@ fn main() {
     shift_ir(&mut device, 0b00_1001);
 
     rti_to_shift_dr(&mut device);
-    device.write(&cmd_write_imm(&[0, 0, 0, 0, 0])).unwrap();
+    device.write(&cmd_write_imm(&[0, 0, 0, 0])).unwrap();
     let mut b4 = [0u8; 4];
     device.read_exact(&mut b4).unwrap();
     println!("read {:#04x?}", b4);
@@ -100,9 +100,9 @@ fn main() {
 
     rti_to_shift_dr(&mut device);
     device
-        .write(&[
-            0x39, 7, 0, 0x1, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x87,
-        ])
+        .write(&cmd_write_imm(&[
+            0x1, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+        ]))
         .unwrap();
     let mut b8 = [0u8; 8];
     device.read_exact(&mut b8);
@@ -111,9 +111,7 @@ fn main() {
 
     rti_to_shift_dr(&mut device);
     device
-        .write(&[
-            0x39, 7, 0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x87,
-        ])
+        .write(&cmd_write_imm(&[0xde, 0xad, 0xbe, 0xef, 1, 3, 3, 7]))
         .unwrap();
     let mut b8 = [0u8; 8];
     device.read_exact(&mut b8);
@@ -122,9 +120,7 @@ fn main() {
 
     rti_to_shift_dr(&mut device);
     device
-        .write(&[
-            0x39, 7, 0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x87,
-        ])
+        .write(&cmd_write_imm(&[0, 0, 0, 0, 0, 0, 0, 0]))
         .unwrap();
     let mut b8 = [0u8; 8];
     device.read_exact(&mut b8);
