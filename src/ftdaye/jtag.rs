@@ -1,6 +1,6 @@
 // jtag helpers for ftdi mpsse
 
-use crate::ftdaye::mpsse::{cmd_write_imm, CmdImm};
+use crate::ftdaye::mpsse::{cmd_read_imm, cmd_read_write_imm, cmd_write_imm, CmdImm};
 use crate::ftdaye::{BitMode, Device};
 
 use log::*;
@@ -9,7 +9,7 @@ use std::io::{Read, Write};
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct FtdiMpsse {
-    device: Device,
+    pub device: Device,
     buffer_size_bytes: u16,
     actual_speed_khz: u16,
 }
@@ -84,13 +84,45 @@ impl FtdiMpsse {
     }
 
     pub fn read_write_register(&mut self, ir: u8, data: &mut [u8]) {
-        debug!("read ir #{:#04x}", ir);
+        debug!("read write ir #{:#04x}", ir);
+        self.rti_to_shift_ir();
+        self.shift_ir(ir);
+
+        self.rti_to_shift_dr();
+
+        self.device.write(&cmd_read_write_imm(data)).unwrap();
+
+        self.device.read_exact(data).unwrap();
+
+        self.dr_to_rti();
+    }
+
+    pub fn write_register(&mut self, ir: u8, data: &[u8]) {
+        debug!("write ir #{:#04x}", ir);
         self.rti_to_shift_ir();
         self.shift_ir(ir);
 
         self.rti_to_shift_dr();
 
         self.device.write(&cmd_write_imm(data)).unwrap();
+
+        self.dr_to_rti();
+    }
+
+    pub fn assert_ftdi_buffer_empty(&mut self) {
+        let mut junk = vec![];
+        let _ = self.device.read_to_end(&mut junk);
+        assert!(junk.len() == 0, "buffer not empty {:?}", junk)
+    }
+
+    pub fn read_register(&mut self, ir: u8, data: &mut [u8]) {
+        debug!("read ir #{:#04x}", ir);
+        self.rti_to_shift_ir();
+        self.shift_ir(ir);
+
+        self.rti_to_shift_dr();
+
+        self.device.write(&cmd_read_imm(data.len())).unwrap();
 
         self.device.read_exact(data).unwrap();
 

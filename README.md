@@ -7,6 +7,7 @@ The code is based on the internal jtag support within the [probe-rs](https://git
 ## Resources
 
 - [ug470](https://docs.amd.com/v/u/en-US/ug470_7Series_Config)
+- [ftdi an108](https://www.ftdichip.com/Documents/AppNotes/AN_108_Command_Processor_for_MPSSE_and_MCU_Host_Bus_Emulation_Modes.pdf)
 
 ## openocd
 

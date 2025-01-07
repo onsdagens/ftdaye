@@ -1,5 +1,5 @@
 use ftdaye::ftdaye::jtag::FtdiMpsse;
-use ftdaye::ftdaye::mpsse::cmd_write_imm;
+use ftdaye::ftdaye::mpsse::cmd_read_write_imm;
 use ftdaye::ftdaye::{BitMode, Device, Interface};
 use log::*;
 use nusb::DeviceInfo;
@@ -18,7 +18,7 @@ fn main() {
 
     debug!("device_info {:?}", device_info);
 
-    let mut device = ftdaye::ftdaye::Builder::new()
+    let device = ftdaye::ftdaye::Builder::new()
         .with_interface(Interface::A)
         .with_read_timeout(Duration::from_secs(5))
         .with_write_timeout(Duration::from_secs(5))
@@ -39,15 +39,16 @@ fn main() {
     assert_eq!(idcode, 0x0362d093);
 
     println!("write user3 through setting ir");
-    let mut data = [0x1, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08];
-    ft.read_write_register(0b10_0010, &mut data);
-    println!("first read {:x?}", data);
+    let data = [0x1, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08];
+    ft.write_register(0b10_0010, &data);
+    println!("first write {:x?}", data);
+    ft.assert_ftdi_buffer_empty();
 
     let mut data = [0xde, 0xad, 0xbe, 0xef, 1, 3, 3, 7];
     ft.read_write_register(0b10_0010, &mut data);
-    println!("second read {:x?}", data);
+    println!("second read write {:x?}", data);
 
-    let mut data = [0, 0, 0, 0, 0, 0, 0, 0];
-    ft.read_write_register(0b10_0010, &mut data);
+    let mut data = [0x0; 8];
+    ft.read_register(0b10_0010, &mut data);
     println!("third read {:x?}", data);
 }
