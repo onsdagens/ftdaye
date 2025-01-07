@@ -1,6 +1,9 @@
 // jtag helpers for ftdi mpsse
 
-use crate::ftdaye::mpsse::{cmd_read_imm, cmd_read_write_imm, cmd_write_imm, CmdImm};
+use crate::ftdaye::mpsse::{
+    cmd_read_imm, cmd_read_write_imm, cmd_write_imm, Clock_Data_Bits_Out_on_neg_ve_LSB_first,
+    Clock_Data_to_TMS_on_neg_ve_LSB_first, CmdImm,
+};
 use crate::ftdaye::{BitMode, Device};
 
 use log::*;
@@ -130,35 +133,54 @@ impl FtdiMpsse {
     }
 
     // reset state machine, and go to rti
-    pub fn reset_to_rti(&mut self) {
-        self.device.write(&[0x4b, 5, 0b11111, CmdImm]).unwrap();
-        self.device.write(&[0x4b, 0, 0b0, CmdImm]).unwrap();
+    pub fn reset_and_to_rti(&mut self) {
+        self.device
+            .write(&[Clock_Data_to_TMS_on_neg_ve_LSB_first, 4, 0b1_1111, CmdImm])
+            .unwrap();
+        self.device
+            .write(&[Clock_Data_to_TMS_on_neg_ve_LSB_first, 0, 0b0, CmdImm])
+            .unwrap();
     }
 
     // go from rti to shift dr
     pub fn rti_to_shift_dr(&mut self) {
-        self.device.write(&[0x4b, 2, 0b001, CmdImm]).unwrap();
+        self.device
+            .write(&[Clock_Data_to_TMS_on_neg_ve_LSB_first, 2, 0b001, CmdImm])
+            .unwrap();
     }
 
     // go from rti to shift ir
     pub fn rti_to_shift_ir(&mut self) {
-        self.device.write(&[0x4b, 3, 0b0011, CmdImm]).unwrap();
+        self.device
+            .write(&[Clock_Data_to_TMS_on_neg_ve_LSB_first, 3, 0b0011, CmdImm])
+            .unwrap();
     }
 
     // go from dr back to rti
     pub fn dr_to_rti(&mut self) {
-        self.device.write(&[0x4b, 2, 0b011, CmdImm]).unwrap();
+        self.device
+            .write(&[Clock_Data_to_TMS_on_neg_ve_LSB_first, 2, 0b011, CmdImm])
+            .unwrap();
     }
 
     // go from ir back to rti
     pub fn ir_to_rti(&mut self, bit7: u8) {
-        self.device.write(&[0x4b, 2, bit7 | 0b011, CmdImm]).unwrap();
+        self.device
+            .write(&[
+                Clock_Data_to_TMS_on_neg_ve_LSB_first,
+                2,
+                bit7 | 0b011,
+                CmdImm,
+            ])
+            .unwrap();
     }
 
     // shift ir and go back to rti
     pub fn shift_ir(&mut self, ir: u8) {
         // 5 bits of ir
-        self.device.write(&[0x1b, 4, ir, CmdImm]).unwrap();
+        self.device
+            .write(&[Clock_Data_Bits_Out_on_neg_ve_LSB_first, 4, ir, CmdImm])
+            .unwrap();
         // msb of ir as bit 7 of next transaction
         self.ir_to_rti((ir & 0b10_0000) << 2);
     }

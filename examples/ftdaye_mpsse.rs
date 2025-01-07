@@ -23,7 +23,7 @@ fn main() {
     let mut ft = FtdiMpsse::new(device, 1000);
 
     println!("-- reset --");
-    ft.reset_to_rti();
+    ft.reset_and_to_rti();
 
     let mut data = [0u8; 4];
     ft.read_write_register(0b00_1001, &mut data);

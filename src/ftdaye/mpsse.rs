@@ -30,17 +30,6 @@ pub const Clock_Data_Bytes_In_on_pos_ve_and_Out_on_neg_ve_LSB_first: u8 = cmd_sh
     true, 
     false);
 
-// // Missing: Clock Data Bytes In on +ve clock edge LSB first (no write)
-// #[rustfmt::skip]
-// pub const Clock_Data_Bytes_In_on_pos_ve_LSB_first: u8 = cmd_shift(
-//     true,
-//     false,
-//     false,
-//     true,
-//     false,
-//     true,
-//     false);
-
 // 3.4.5 Clock Data Bytes In on +ve clock edge LSB first (no write)
 #[rustfmt::skip]
 pub const Clock_Data_Bytes_In_on_pos_ve_LSB_first: u8 = cmd_shift(
@@ -57,6 +46,28 @@ pub const Clock_Data_Bytes_In_on_pos_ve_LSB_first: u8 = cmd_shift(
 pub const Clock_Data_Bytes_Out_on_neg_ve_LSB_first: u8 = cmd_shift(
     true, 
     false, 
+    false, 
+    true, 
+    true, 
+    false, 
+    false);
+
+// 3.5.1 Clock Data to TMS pin (no read)
+#[rustfmt::skip]
+pub const Clock_Data_to_TMS_on_neg_ve_LSB_first: u8 = cmd_shift(
+    true, 
+    true, 
+    false, 
+    true, 
+    false, 
+    false, 
+    true);
+
+// Clock Data Bits Out on -ve clock edge LSB first (no read)
+#[rustfmt::skip]
+pub const Clock_Data_Bits_Out_on_neg_ve_LSB_first : u8 = cmd_shift(
+    true, 
+    true, 
     false, 
     true, 
     true, 
@@ -151,5 +162,7 @@ mod test {
         );
         assert_eq!(Clock_Data_Bytes_In_on_pos_ve_LSB_first, 0x28);
         assert_eq!(Clock_Data_Bytes_Out_on_neg_ve_LSB_first, 0x19);
+        assert_eq!(Clock_Data_to_TMS_on_neg_ve_LSB_first, 0x4b);
+        assert_eq!(Clock_Data_Bits_Out_on_neg_ve_LSB_first, 0x1b);
     }
 }
