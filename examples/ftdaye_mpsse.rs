@@ -1,12 +1,7 @@
-use ftdaye::ftdaye::jtag::FtdiMpsse;
-use ftdaye::ftdaye::mpsse::cmd_read_write_imm;
-use ftdaye::ftdaye::{BitMode, Device, Interface};
+use ftdaye::ftdaye::{jtag::FtdiMpsse, Interface};
 use log::*;
-use nusb::DeviceInfo;
-use std::{
-    io::{Read, Write},
-    time::Duration,
-};
+
+use std::time::Duration;
 
 fn main() {
     pretty_env_logger::init();
