@@ -29,6 +29,7 @@ pub mod command_compacter;
 pub mod ftdaye;
 use log::*;
 pub mod usb_util;
+pub mod xilinx7;
 
 use command_compacter::Command;
 pub use ftdaye::{error::FtdiError, ChipType};
