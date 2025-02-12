@@ -184,4 +184,28 @@ impl FtdiMpsse {
         // msb of ir as bit 7 of next transaction
         self.ir_to_rti((ir & 0b10_0000) << 2);
     }
+
+    // shift ir and go back to rti
+    pub fn shift_ir_bits(&mut self, ir: u8, bit_amount: u8) {
+        // 5 bits of ir
+        self.device
+            .write(&[
+                Clock_Data_Bits_Out_on_neg_ve_LSB_first,
+                bit_amount - 1,
+                ir,
+                CmdImm,
+            ])
+            .unwrap();
+        // msb of ir as bit 7 of next transaction
+        self.ir_to_rti((ir & 0b10_0000) << 2);
+    }
+
+    pub fn shift_ir_bytes(&mut self, bytes: &[u8]) {
+        for byte in bytes {
+            self.device
+                .write(&[Clock_Data_Bits_Out_on_neg_ve_LSB_first, 8, *byte, CmdImm])
+                .unwrap();
+        }
+        self.ir_to_rti(0);
+    }
 }
