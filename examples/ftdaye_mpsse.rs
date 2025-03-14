@@ -6,6 +6,11 @@ use log::*;
 
 use std::time::Duration;
 
+enum INSN {
+    SIZE = 5,
+    BASE = 6,
+}
+
 fn main() {
     pretty_env_logger::init();
 
@@ -28,11 +33,16 @@ fn main() {
     println!("-- reset --");
     ft.reset_and_to_rti();
 
-    ft.rti_to_shift_ir();
-    ft.shift_ir(IR_USER3);
     //ft.rti_to_shift_ir();
+    //ft.shift_ir(IR_USER3);
+    //ft.rti_to_shift_dr();
+    //println!("{}", INSN::BASE as u8);
+    // ft.shift_ir(INSN::BASE as u8);
     //ft.reset_and_to_rti();
-    ft.shift_ir_bytes(&[3u8, 5u8, 7u8, 9u8]);
+    //ft.rti_to_shift_ir();
+    //ft.shift_ir(6);
+    //ft.rti_to_shift_ir();
+    // ft.shift_ir(6);
     // let mut data = [0u8; 4];
     // ft.read_register(IR_IDCODE, &mut data);
     // println!("read data   {:#04x?}", data);
@@ -50,11 +60,20 @@ fn main() {
     //ft.read_write_register(IR_USER3, &mut data);
     //println!("Data written");
 
-    //println!("write user3 through setting ir");
-    //let data = [0x1, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08];
-    //ft.write_register(IR_USER3, &data);
-    //println!("first write {:x?}", data);
-    //ft.assert_ftdi_buffer_empty();
+    println!("write user3 through setting ir");
+    let data = [
+        0xDE, 0xAD, 0xBE,
+        0xEF, //0x00, 0x00, 0xd0, 0x73, // csrrwi x0, 0x0, 0b1111
+             //0x00, 0x00, 0x00, 0x00,
+             //0x00, 0x00, 0x00, 0x63, // beq x0, x0, 0
+    ];
+    //let data = [0x00, 0x00, 0x00, 0x33, 0x33, 0x70, 0x00, 0x93];
+    ft.write_register(IR_USER3, &data);
+    println!("first write {:x?}", data);
+    ft.assert_ftdi_buffer_empty();
+    ft.reset_and_to_rti();
+    //let mut data = [0u8; 4];
+    //ft.read_register(IR_IDCODE, &mut data);
 
     //let mut data = [
     //    0xde, 0xad, 0xbe, 0xef, 1, 3, 3, 7, 0xde, 0xad, 0xbe, 0xef, 1, 3, 3, 7, 8,
