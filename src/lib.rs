@@ -21,7 +21,6 @@ use bitvec::prelude::*;
 use nusb::DeviceInfo;
 use std::{
     io::{Read, Write},
-    iter,
     time::{Duration, Instant},
 };
 
@@ -597,6 +596,7 @@ impl TryFrom<(FtdiDevice, Option<ChipType>)> for FtdiProperties {
 #[derive(Debug, Clone, Copy)]
 pub struct FtdiDevice {
     /// The (VID, PID) pair of this device.
+    #[allow(dead_code)]
     id: (u16, u16),
 
     /// FTDI chip type to use if the device is not recognized.
