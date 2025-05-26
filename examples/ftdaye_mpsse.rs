@@ -1,15 +1,15 @@
 use ftdaye::{
     ftdaye::{jtag::FtdiMpsse, Interface},
-    xilinx7::{IR_IDCODE, IR_USER3, IR_USER4, IR_USERCODE},
+    //xilinx7::{IR_IDCODE, IR_USER3, IR_USER4, IR_USERCODE},
 };
 use log::*;
 
 use std::time::Duration;
 
-enum INSN {
-    SIZE = 5,
-    BASE = 6,
-}
+//enum INSN {
+//    SIZE = 5,
+//    BASE = 6,
+//}
 
 fn main() {
     pretty_env_logger::init();
@@ -22,7 +22,7 @@ fn main() {
     debug!("device_info {:?}", device_info);
 
     let device = ftdaye::ftdaye::Builder::new()
-        .with_interface(Interface::A)
+        .with_interface(Interface::B)
         .with_read_timeout(Duration::from_secs(5))
         .with_write_timeout(Duration::from_secs(5))
         .usb_open(device_info)
@@ -33,13 +33,13 @@ fn main() {
     println!("-- reset --");
     ft.reset_and_to_rti();
 
-    //ft.rti_to_shift_ir();
+    ft.rti_to_shift_dr();
     //ft.shift_ir(IR_USER3);
     //ft.rti_to_shift_dr();
     //println!("{}", INSN::BASE as u8);
     // ft.shift_ir(INSN::BASE as u8);
-    //ft.reset_and_to_rti();
-    //ft.rti_to_shift_ir();
+    ft.reset_and_to_rti();
+    ft.rti_to_shift_ir();
     //ft.shift_ir(6);
     //ft.rti_to_shift_ir();
     // ft.shift_ir(6);
@@ -60,18 +60,18 @@ fn main() {
     //ft.read_write_register(IR_USER3, &mut data);
     //println!("Data written");
 
-    println!("write user3 through setting ir");
-    let data = [
-        0xDE, 0xAD, 0xBE,
-        0xEF, //0x00, 0x00, 0xd0, 0x73, // csrrwi x0, 0x0, 0b1111
-             //0x00, 0x00, 0x00, 0x00,
-             //0x00, 0x00, 0x00, 0x63, // beq x0, x0, 0
-    ];
+    //println!("write user3 through setting ir");
+    //let data = [
+    //    0xDE, 0xAD, 0xBE,
+    //    0xEF, //0x00, 0x00, 0xd0, 0x73, // csrrwi x0, 0x0, 0b1111
+    //0x00, 0x00, 0x00, 0x00,
+    //0x00, 0x00, 0x00, 0x63, // beq x0, x0, 0
+    //];
     //let data = [0x00, 0x00, 0x00, 0x33, 0x33, 0x70, 0x00, 0x93];
-    ft.write_register(IR_USER3, &data);
-    println!("first write {:x?}", data);
-    ft.assert_ftdi_buffer_empty();
-    ft.reset_and_to_rti();
+    //ft.write_register(IR_USER3, &data);
+    //println!("first write {:x?}", data);
+    //ft.assert_ftdi_buffer_empty();
+    //ft.reset_and_to_rti();
     //let mut data = [0u8; 4];
     //ft.read_register(IR_IDCODE, &mut data);
 

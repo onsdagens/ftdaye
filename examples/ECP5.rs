@@ -24,8 +24,16 @@ fn main() {
 
     println!("-- reset --");
     ft.reset_and_to_rti();
+    let mut data = [0 as u8; 4];
+    // the lib side implementation expects IR to be 5 bits wide, ours is only 4
+    // so concat something to right side (it will be shifted out by the 5th shift)
+    ft.read_register(0b01100, &mut data);
+    println!("IDCODE: 0x{:08X}", u32::from_le_bytes(data));
+    assert_eq!(data, [0xef, 0xbe, 0xad, 0xde]);
 
-    ft.rti_to_shift_dr();
-    ft.reset_and_to_rti();
-    ft.rti_to_shift_ir();
+    // now, write some data to reg 0x1.
+    let mut data = [0x0A as u8; 1];
+    // again the actual address is 0b0001, but the address is expected to be 5 bits wide by the
+    // lib.
+    ft.write_register(0b00010, &mut data);
 }

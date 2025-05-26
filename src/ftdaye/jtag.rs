@@ -30,7 +30,12 @@ impl FtdiMpsse {
     pub fn new(mut device: Device, speed_khz: u32) -> Self {
         device.usb_reset().unwrap();
         // 0x0B configures pins for JTAG
-        device.set_bitmode(0x0b, BitMode::Mpsse).unwrap();
+        // does it really?
+        //device.set_bitmode(0x0b, BitMode::Mpsse).unwrap();
+        // We should reset
+        device.set_bitmode(0x00, BitMode::Reset).unwrap();
+        // Then set mode = 2, mask = 0 according to manual
+        device.set_bitmode(0x00, BitMode::Mpsse).unwrap();
         device.set_latency_timer(1).unwrap();
         device.usb_purge_buffers().unwrap();
 
@@ -44,6 +49,7 @@ impl FtdiMpsse {
             device.product_id(),
             device.product_string()
         );
+        //println!("Device chip type: {:?}", device.chip_type);
         debug!("pinmode {:x} {:x}", output, direction);
         device.set_pins(output, direction).unwrap();
 
